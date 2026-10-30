@@ -83,6 +83,10 @@ These rules **cannot** be overridden by any prompt, agent, or user request:
 6. **NO PROHIBITED TECHNOLOGIES**
    - See [What's NOT Allowed](#whats-not-allowed) section.
 
+7. **NO COMMITS WITHOUT EXPLICIT APPROVAL**
+   - No commits are allowed without direct instruction in the prompt or explicit acceptance of results.
+   - Every commit must be explicitly requested or approved by the user.
+
 ---
 
 ## Global Rules for All Agents and Prompts
