@@ -1,7 +1,7 @@
 # ADR-001: Technology Stack Selection
 
 ## Status
-✅ Accepted
+🗑️ Superseded by [ADR-002](ADR-002-NET10-Migration.md) for runtime decision
 
 ## Context
 The project needs a technology stack for building a mind-mapping application. The primary goal is to create a **practical tool** while also serving as a **learning playground** for exploring .NET technologies, architectural approaches, and UI patterns.
@@ -120,5 +120,6 @@ Development will begin with:
 - Domain layer decisions (C#, .NET) are independent of UI choice and can evolve separately
 
 ## Related
+- [ADR-002: Migrate Runtime from .NET 8 to .NET 10](ADR-002-NET10-Migration.md) - Runtime update (supersedes .NET 8 decision)
 - [README.md](../../README.md) - Project overview and goals
 - [AGENTS.md](../../AGENTS.md) - Global configuration for AI agents
