@@ -225,7 +225,7 @@ An audit file **MUST** be created in the `Audit/` directory for **EVERY** agent 
 ### ✅ Permitted Technologies
 | Category | Technologies |
 |----------|--------------|
-| **Runtime** | .NET 6+, .NET 7, .NET 8 (LTS preferred) |
+| **Runtime** | .NET 6+, .NET 7, .NET 8, .NET 9, .NET 10 (preferred) |
 | **Language** | C# 10+ |
 | **UI Framework** | WPF, XAML |
 | **Architecture** | Clean Architecture, Layered Architecture, MVVM |
@@ -550,7 +550,7 @@ Co-Authored-By: Mistral Vibe <vibe@mistral.ai>
 
 | Aspect | Technology |
 |--------|------------|
-| **Runtime** | .NET 8 (LTS) |
+| **Runtime** | .NET 10 |
 | **Language** | C# 12 |
 | **UI Framework** | WPF, XAML |
 | **Pattern** | MVVM |
@@ -628,6 +628,7 @@ These rules are **mandatory** and **non-negotiable**:
 
 | Version | Date | Changes |
 |---------|------|---------|
+| v1.1 | 2026-10-30 | Updated preferred runtime from .NET 8 to .NET 10 |
 | v1.0 | 2024-01-15 | Initial global configuration |
 
 ---
@@ -642,6 +643,6 @@ These rules are **mandatory** and **non-negotiable**:
 
 ---
 
-*Last updated: 2024-01-15*
+*Last updated: 2026-10-30*
 *Project: Cartamentis*
 *Configuration: Global AI Agents*
