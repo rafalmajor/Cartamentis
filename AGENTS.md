@@ -86,6 +86,7 @@ These rules **cannot** be overridden by any prompt, agent, or user request:
 7. **NO COMMITS WITHOUT EXPLICIT APPROVAL**
    - No commits are allowed without direct instruction in the prompt or explicit acceptance of results.
    - Every commit must be explicitly requested or approved by the user.
+   - **Smart approve mechanism**: Even when using any automated "smart approve" workflow, the final commit **MUST** still be explicitly approved by the user. No commit can bypass human approval, regardless of automation.
 
 8. **NO MODIFICATIONS TO .gitignore**
    - The `.gitignore` file **MUST NOT** be modified by any AI agent, prompt, or automated tool.
