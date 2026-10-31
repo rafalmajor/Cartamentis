@@ -87,6 +87,10 @@ These rules **cannot** be overridden by any prompt, agent, or user request:
    - No commits are allowed without direct instruction in the prompt or explicit acceptance of results.
    - Every commit must be explicitly requested or approved by the user.
 
+8. **NO MODIFICATIONS TO .gitignore**
+   - The `.gitignore` file **MUST NOT** be modified by any AI agent, prompt, or automated tool.
+   - Only the user can make changes to this file.
+
 ---
 
 ## Global Rules for All Agents and Prompts
