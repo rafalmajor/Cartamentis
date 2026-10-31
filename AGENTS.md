@@ -91,6 +91,12 @@ These rules **cannot** be overridden by any prompt, agent, or user request:
    - The `.gitignore` file **MUST NOT** be modified by any AI agent, prompt, or automated tool.
    - Only the user can make changes to this file.
 
+9. **QUALITY GATES REQUIRED**
+   - The quality gates defined in `docs/AI_AGENT_QUALITY_GATES.md` **MUST** be applied when:
+     - Adding a new project to the solution
+     - Connecting the solution to a cloud solution
+   - All active quality gates for the current project maturity level must pass before any commit.
+
 ---
 
 ## Global Rules for All Agents and Prompts
