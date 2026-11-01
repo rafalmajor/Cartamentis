@@ -1,0 +1,41 @@
+name: .NET CI Build and Test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup .NET 10
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 10.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore Cartamentis.sln
+
+    - name: Build solution
+      run: dotnet build Cartamentis.sln --no-restore --configuration Release
+
+    - name: Run tests
+      run: dotnet test Cartamentis.sln --no-build --configuration Release --verbosity normal
+
+    - name: Publish WPF application
+      run: dotnet publish src/Cartamentis.Wpf/Cartamentis.Wpf.csproj --configuration Release --output ./publish --self-contained false
+
+    - name: Create ZIP archive
+      shell: pwsh
+      run: Compress-Archive -Path ./publish/* -DestinationPath Cartamentis-WPF-${{ github.sha }}.zip -Force
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: Cartamentis-WPF-${{ github.sha }}
+        path: Cartamentis-WPF-${{ github.sha }}.zip
