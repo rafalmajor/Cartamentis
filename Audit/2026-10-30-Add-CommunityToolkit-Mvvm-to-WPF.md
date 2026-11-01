@@ -13,11 +13,11 @@
 - [x] Modified: `src/Cartamentis.Wpf/Cartamentis.Wpf.csproj` - Added CommunityToolkit.Mvvm NuGet package reference (version 8.2.2)
 
 ## Validation Results
-- **Tests Passed**: N.A. (Package addition only, requires build verification)
-- **Build Status**: Pending (Needs to be verified with `dotnet build`)
+- **Tests Passed**: N.A. (Package addition only, no test code changes)
+- **Build Status**: Success ✅
 - **Test Coverage**: N.A.
 - **New Tests Added**: None
-- **Validation Notes**: Package reference added. Version 8.2.2 is the latest stable version compatible with .NET 10. Build verification required to confirm compatibility.
+- **Validation Notes**: Package reference added successfully. `dotnet build` completed with 0 warnings and 0 errors. Version 8.2.2 is compatible with .NET 10 and WPF.
 
 ## Conclusions
 - **Action Taken**: Added CommunityToolkit.Mvvm package to Cartamentis.Wpf project as per ADR-004 decision
