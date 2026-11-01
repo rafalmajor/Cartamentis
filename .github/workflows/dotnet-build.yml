@@ -28,13 +28,16 @@ jobs:
       run: dotnet test Cartamentis.sln --no-build --configuration Release --verbosity normal
 
     - name: Publish WPF application
+      if: success()
       run: dotnet publish src/Cartamentis.Wpf/Cartamentis.Wpf.csproj --configuration Release --output ./publish --self-contained false
 
     - name: Create ZIP archive
+      if: success()
       shell: pwsh
       run: Compress-Archive -Path ./publish/* -DestinationPath Cartamentis-WPF-${{ github.sha }}.zip -Force
 
     - name: Upload artifact
+      if: success()
       uses: actions/upload-artifact@v4
       with:
         name: Cartamentis-WPF-${{ github.sha }}
