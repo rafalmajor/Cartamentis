@@ -72,7 +72,7 @@ public partial class MindMapView : UserControl
 
     private void Canvas_PreviewMouseMove(object sender, MouseEventArgs e)
     {
-        if (_draggedTopic == null || !Mouse.Captured) return;
+        if (_draggedTopic == null || Mouse.Captured == null) return;
 
         var currentPosition = e.GetPosition(MindMapCanvas);
         var distance = Point.Subtract(currentPosition, _dragStartPoint).Length;
@@ -115,9 +115,9 @@ public partial class MindMapView : UserControl
         if (!_isDragging && _draggedTopic != null)
         {
             // Single click - select topic
-            if (DataContext is MindMapViewModel viewModel)
+            if (DataContext is MindMapViewModel currentViewModel)
             {
-                viewModel.SelectedTopic = _draggedTopic;
+                currentViewModel.SelectedTopic = _draggedTopic;
             }
         }
         else if (_isDragging)
@@ -134,15 +134,15 @@ public partial class MindMapView : UserControl
                 dropTarget = targetBorder.DataContext as TopicViewModel;
             }
             
-            if (DataContext is MindMapViewModel viewModel)
+            if (DataContext is MindMapViewModel currentViewModel)
             {
-                if (dropTarget != null && viewModel.CanDrop(dropTarget))
+                if (dropTarget != null && currentViewModel.CanDrop(dropTarget))
                 {
-                    viewModel.CompleteDrag(dropTarget);
+                    currentViewModel.CompleteDrag(dropTarget);
                 }
                 else
                 {
-                    viewModel.CancelDrag();
+                    currentViewModel.CancelDrag();
                 }
             }
 
@@ -151,7 +151,7 @@ public partial class MindMapView : UserControl
         }
 
         // Clean up
-        if (Mouse.Captured)
+        if (Mouse.Captured != null)
         {
             Mouse.Capture(null);
         }
