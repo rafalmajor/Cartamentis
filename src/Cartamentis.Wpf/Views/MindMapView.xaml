@@ -3,53 +3,75 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Cartamentis.Wpf.Views"
              xmlns:viewModels="clr-namespace:Cartamentis.Application.ViewModels;assembly=Cartamentis.Application"
-             xmlns:converters="clr-namespace:Cartamentis.Wpf.Converters">
+             xmlns:converters="clr-namespace:Cartamentis.Wpf.Converters"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors">
     <UserControl.Resources>
         <converters:AddOffsetConverter x:Key="AddOffsetConverter" />
+        
+        <!-- Brush resources -->
+        <SolidColorBrush x:Key="SelectedBorderBrush" Color="#FF0066CC" />
+        <SolidColorBrush x:Key="SelectedBackgroundBrush" Color="#FFE6F2FF" />
+        <SolidColorBrush x:Key="NormalBorderBrush" Color="Black" />
+        <SolidColorBrush x:Key="NormalBackgroundBrush" Color="White" />
+        <SolidColorBrush x:Key="DragAdornerBrush" Color="#400066CC" />
+        
+        <!-- Style for Topic View -->
+        <Style x:Key="TopicBorderStyle" TargetType="Border">
+            <Setter Property="Width" Value="120" />
+            <Setter Property="Height" Value="40" />
+            <Setter Property="Background" Value="{StaticResource NormalBackgroundBrush}" />
+            <Setter Property="BorderBrush" Value="{StaticResource NormalBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="Panel.ZIndex" Value="1" />
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                    <Setter Property="BorderBrush" Value="{StaticResource SelectedBorderBrush}" />
+                    <Setter Property="Background" Value="{StaticResource SelectedBackgroundBrush}" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding IsDragging, RelativeSource={RelativeSource AncestorType=Border}}" Value="True">
+                    <Setter Property="Opacity" Value="0.5" />
+                    <Setter Property="BorderBrush" Value="{StaticResource DragAdornerBrush}" />
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- Context Menu for topics -->
+        <ContextMenu x:Key="TopicContextMenu" DataContext="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource Self}}">
+            <MenuItem Header="Add Child" Command="{Binding DataContext.AddChildCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Add Sibling" Command="{Binding DataContext.AddSiblingCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Rename" Command="{Binding DataContext.EditTopicCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}" />
+            <Separator />
+            <MenuItem Header="Promote" Command="{Binding DataContext.PromoteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Demote" Command="{Binding DataContext.DemoteCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
+            <MenuItem Header="Clone" Command="{Binding DataContext.CloneSubtreeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Remove Leaf" Command="{Binding DataContext.RemoveLeafCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <MenuItem Header="Remove Subtree" Command="{Binding DataContext.RemoveSubtreeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" />
+            <Separator />
+            <MenuItem Header="Extract Subtree" Command="{Binding DataContext.ExtractSubtreeCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}" CommandParameter="{Binding}" />
+        </ContextMenu>
     </UserControl.Resources>
-    <ScrollViewer HorizontalScrollBarVisibility="Auto" 
+    
+    <ScrollViewer x:Name="ScrollViewer" 
+                  HorizontalScrollBarVisibility="Auto" 
                   VerticalScrollBarVisibility="Auto" 
-                  CanContentScroll="True">
+                  CanContentScroll="True"
+                  Focusable="True">
         <Canvas x:Name="MindMapCanvas" 
                 Background="White" 
-                ClipToBounds="True">
-            
-            <!-- Topics -->
-            <ItemsControl ItemsSource="{Binding AllTopics}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                
-                <ItemsControl.ItemContainerStyle>
-                    <Style TargetType="ContentPresenter">
-                        <Setter Property="Canvas.Left" Value="{Binding X}" />
-                        <Setter Property="Canvas.Top" Value="{Binding Y}" />
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-                
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="{x:Type viewModels:TopicViewModel}">
-                        <Border Width="120" 
-                                Height="40" 
-                                Background="White" 
-                                BorderBrush="Black" 
-                                BorderThickness="1" 
-                                Panel.ZIndex="1">
-                            <TextBlock Text="{Binding Content}"
-                                       HorizontalAlignment="Center"
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"
-                                       FontSize="12" />
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                ClipToBounds="True"
+                AllowDrop="True"
+                PreviewMouseLeftButtonDown="Canvas_PreviewMouseLeftButtonDown"
+                PreviewMouseMove="Canvas_PreviewMouseMove"
+                MouseLeftButtonUp="Canvas_MouseLeftButtonUp"
+                Drop="Canvas_Drop"
+                DragOver="Canvas_DragOver"
+                DragLeave="Canvas_DragLeave"
+                MouseRightButtonDown="Canvas_MouseRightButtonDown">
             
             <!-- Connections (drawn behind topics) -->
-            <!-- Using MultiBinding for connections would be better, but for simplicity we use direct binding -->
-            <!-- The connection goes from the center of parent to the center of child -->
             <ItemsControl ItemsSource="{Binding Connections}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -71,6 +93,58 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            
+            <!-- Topics -->
+            <ItemsControl ItemsSource="{Binding AllTopics}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                
+                <ItemsControl.ItemContainerStyle>
+                    <Style TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding X}" />
+                        <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+                
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:TopicViewModel}">
+                        <Border Style="{StaticResource TopicBorderStyle}"
+                                ContextMenu="{StaticResource TopicContextMenu}"
+                                MouseLeftButtonDown="Topic_MouseLeftButtonDown"
+                                MouseRightButtonDown="Topic_MouseRightButtonDown"
+                                PreviewMouseMove="Topic_PreviewMouseMove"
+                                MouseMove="Topic_MouseMove"
+                                AllowDrop="False">
+                            <TextBlock Text="{Binding Content}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       FontSize="12" 
+                                       FontWeight="{Binding IsRoot, Converter={StaticResource BooleanToFontWeightConverter}}" />
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            
+            <!-- Drag adorner (visual feedback during drag) -->
+            <Border x:Name="DragAdorner" 
+                    Width="120" 
+                    Height="40" 
+                    Background="{StaticResource DragAdornerBrush}" 
+                    BorderBrush="{StaticResource SelectedBorderBrush}" 
+                    BorderThickness="2" 
+                    CornerRadius="4" 
+                    Panel.ZIndex="100" 
+                    Visibility="Collapsed">
+                <TextBlock x:Name="DragAdornerText" 
+                           HorizontalAlignment="Center" 
+                           VerticalAlignment="Center" 
+                           Foreground="White" 
+                           FontSize="12" />
+            </Border>
         </Canvas>
     </ScrollViewer>
 </UserControl>

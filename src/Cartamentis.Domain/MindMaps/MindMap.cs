@@ -11,13 +11,15 @@ public sealed class MindMap
     {
         Id = id;
         Root = root;
+        Root.MindMap = this; // Set the mind map reference
     }
 
     public static MindMap Create(string rootContent)
     {
         var mindMapId = MindMapId.New();
-        var root = Topic.CreateRoot(rootContent, mindMapId);
-        return new MindMap(mindMapId, root);
+        var root = new Topic(TopicId.NewUnique(), rootContent, null!);
+        var mindMap = new MindMap(mindMapId, root);
+        return mindMap;
     }
 
     public static MindMap CreateFromRoot(Topic root)

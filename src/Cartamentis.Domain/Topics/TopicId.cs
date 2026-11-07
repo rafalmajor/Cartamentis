@@ -14,7 +14,11 @@ public readonly record struct TopicId
         _value = value;
     }
 
+    public Guid Value => _value;
+
     public static TopicId New() => new();
+
+    public static TopicId NewUnique() => new(Guid.NewGuid());
 
     public override string ToString() => _value.ToString();
 }
