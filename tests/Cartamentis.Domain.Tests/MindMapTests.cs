@@ -44,7 +44,7 @@ public sealed class MindMapTests
         var dotNet = Topic.CreateChild(".NET", mindMap.Id, mindMap.Root);
 
         Assert.Single(mindMap.Root.Children);
-        Assert.Equal(".NET", mindMap.Root.Children[0].Content);
+        Assert.Equal(".NET", mindMap.Root.Children.ElementAt(0).Content);
     }
 
     [Fact]
@@ -83,11 +83,11 @@ public sealed class MindMapTests
     public void AddChild_IsStructuralMutation()
     {
         var mindMap = MindMap.Create("Programming");
-        var initialCount = mindMap.Root.Children.Count;
+        var initialCount = mindMap.Root.Children.Count();
 
         var dotNet = Topic.CreateChild(".NET", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(initialCount + 1, mindMap.Root.Children.Count);
+        Assert.Equal(initialCount + 1, mindMap.Root.Children.Count());
     }
 
     // 27. Tree Invariants - A mind map has exactly one root
@@ -231,7 +231,7 @@ public sealed class MindMapTests
         var dotNet = Topic.CreateChild(".NET", mindMap.Id, mindMap.Root);
         var python = Topic.CreateChild("Python", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(2, mindMap.Root.Children.Count);
+        Assert.Equal(2, mindMap.Root.Children.Count());
         Assert.Equal(dotNet.Parent, python.Parent);
     }
 
@@ -243,11 +243,9 @@ public sealed class MindMapTests
         var dotNet = Topic.CreateChild(".NET", mindMap.Id, mindMap.Root);
         var python = Topic.CreateChild("Python", mindMap.Id, mindMap.Root);
 
-        var result = mindMap.Root.RemoveChild(python);
-
-        Assert.True(result);
+        mindMap.Root.RemoveChild(python);
         Assert.Single(mindMap.Root.Children);
-        Assert.Equal(dotNet, mindMap.Root.Children[0]);
+        Assert.Equal(dotNet, mindMap.Root.Children.ElementAt(0));
     }
 
     // 10. Remove Subtree
@@ -259,9 +257,7 @@ public sealed class MindMapTests
         var desktop = Topic.CreateChild("Desktop", mindMap.Id, dotNet);
         var web = Topic.CreateChild("Web", mindMap.Id, dotNet);
 
-        var result = mindMap.Root.RemoveChild(dotNet);
-
-        Assert.True(result);
+        mindMap.Root.RemoveChild(dotNet);
         Assert.Empty(mindMap.Root.Children);
     }
 
@@ -308,7 +304,7 @@ public sealed class MindMapTests
     {
         var mindMap = MindMap.Create("A");
 
-        Assert.Throws<InvalidOperationException>(() => mindMap.Root.AddChild(mindMap.Root));
+        Assert.Throws<ArgumentException>(() => mindMap.Root.AddChild(mindMap.Root));
     }
 
     [Fact]
@@ -409,7 +405,7 @@ public sealed class MindMapTests
     {
         var mindMap = MindMap.Create("Root");
 
-        Assert.Equal(0, mindMap.Root.GetDepth());
+        Assert.Equal(0, mindMap.Root.Depth);
     }
 
     [Fact]
@@ -418,7 +414,7 @@ public sealed class MindMapTests
         var mindMap = MindMap.Create("Root");
         var child = Topic.CreateChild("Child", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(1, child.GetDepth());
+        Assert.Equal(1, child.Depth);
     }
 
     [Fact]
@@ -428,7 +424,7 @@ public sealed class MindMapTests
         var child = Topic.CreateChild("Child", mindMap.Id, mindMap.Root);
         var grandchild = Topic.CreateChild("Grandchild", mindMap.Id, child);
 
-        Assert.Equal(2, grandchild.GetDepth());
+        Assert.Equal(2, grandchild.Depth);
     }
 
     // 27. Tree Invariants - There is exactly one hierarchical path from the root to every topic
@@ -455,9 +451,8 @@ public sealed class MindMapTests
         var mindMap = MindMap.Create("A");
         var b = Topic.CreateChild("B", mindMap.Id, mindMap.Root);
 
-        var result = mindMap.Root.RemoveChild(b);
+        mindMap.Root.RemoveChild(b);
 
-        Assert.True(result);
         Assert.Empty(mindMap.Root.Children);
         Assert.Null(b.Parent);
     }
@@ -470,9 +465,7 @@ public sealed class MindMapTests
         var otherMindMap = MindMap.Create("Other");
         var c = Topic.CreateChild("C", otherMindMap.Id, otherMindMap.Root);
 
-        var result = mindMap.Root.RemoveChild(c);
-
-        Assert.False(result);
+        Assert.Throws<ArgumentException>(() => mindMap.Root.RemoveChild(c));
     }
 
     // 13. Promote
@@ -489,7 +482,7 @@ public sealed class MindMapTests
         mindMap.Root.AddChild(desktop);
 
         Assert.Equal(mindMap.Root, desktop.Parent);
-        Assert.Equal(1, desktop.GetDepth());
+        Assert.Equal(1, desktop.Depth);
         Assert.Equal(desktop, wpf.Parent);
     }
 
@@ -518,7 +511,7 @@ public sealed class MindMapTests
         dotNet.AddChild(desktop);
 
         Assert.Equal(dotNet, desktop.Parent);
-        Assert.Equal(2, desktop.GetDepth());
+        Assert.Equal(2, desktop.Depth);
     }
 
     // 15. Reorder Siblings
@@ -572,7 +565,7 @@ public sealed class MindMapTests
 
         Assert.Equal("DDD", newMindMap.Root.Content);
         Assert.Single(newMindMap.Root.Children);
-        Assert.Equal("Entity", newMindMap.Root.Children[0].Content);
+        Assert.Equal("Entity", newMindMap.Root.Children.ElementAt(0).Content);
     }
 
     // 25. Structural Queries
@@ -585,7 +578,7 @@ public sealed class MindMapTests
 
         var children = mindMap.Root.Children;
 
-        Assert.Equal(2, children.Count);
+        Assert.Equal(2, children.Count());
         Assert.Contains(b, children);
         Assert.Contains(c, children);
     }
@@ -632,8 +625,8 @@ public sealed class MindMapTests
         var c = Topic.CreateChild("C", mindMap.Id, mindMap.Root);
 
         var children = mindMap.Root.Children.ToList();
-        Assert.Equal(b, children[0]);
-        Assert.Equal(c, children[1]);
+        Assert.Equal(b, children.ElementAt(0));
+        Assert.Equal(c, children.ElementAt(1));
     }
 
     // 29. Software Architecture example structure
@@ -649,8 +642,8 @@ public sealed class MindMapTests
         var connection = Topic.CreateChild("Connection", mindMap.Id, domain);
         var mindMapTopic = Topic.CreateChild("MindMap", mindMap.Id, domain);
 
-        Assert.Equal(3, mindMap.Root.Children.Count);
-        Assert.Equal(3, domain.Children.Count);
+        Assert.Equal(3, mindMap.Root.Children.Count());
+        Assert.Equal(3, domain.Children.Count());
     }
 
     // 31. Class Design example
@@ -662,7 +655,7 @@ public sealed class MindMapTests
         var content = Topic.CreateChild("Content", mindMap.Id, mindMap.Root);
         var children = Topic.CreateChild("Children", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(3, mindMap.Root.Children.Count);
+        Assert.Equal(3, mindMap.Root.Children.Count());
     }
 
     // 27. Tree Invariants - Cloning creates new topic identities
@@ -685,7 +678,7 @@ public sealed class MindMapTests
         var mindMap = MindMap.Create("Root");
 
         Assert.True(mindMap.Root.IsRoot);
-        Assert.Equal(0, mindMap.Root.GetDepth());
+        Assert.Equal(0, mindMap.Root.Depth);
     }
 
     [Fact]
@@ -738,7 +731,7 @@ public sealed class MindMapTests
         var business = Topic.CreateChild("Business", mindMap.Id, mindMap.Root);
         var risks = Topic.CreateChild("Risks", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(4, mindMap.Root.Children.Count);
+        Assert.Equal(4, mindMap.Root.Children.Count());
     }
 
     // 29. Problem Analysis example
@@ -752,7 +745,7 @@ public sealed class MindMapTests
         var evidence = Topic.CreateChild("Evidence", mindMap.Id, mindMap.Root);
         var solutions = Topic.CreateChild("Solutions", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(5, mindMap.Root.Children.Count);
+        Assert.Equal(5, mindMap.Root.Children.Count());
     }
 
     // 30. Book Notes example
@@ -766,6 +759,6 @@ public sealed class MindMapTests
         var tradition = Topic.CreateChild("Tradition", mindMap.Id, mindMap.Root);
         var criticism = Topic.CreateChild("Criticism", mindMap.Id, mindMap.Root);
 
-        Assert.Equal(5, mindMap.Root.Children.Count);
+        Assert.Equal(5, mindMap.Root.Children.Count());
     }
 }

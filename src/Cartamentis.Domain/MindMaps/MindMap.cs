@@ -5,20 +5,24 @@ namespace Cartamentis.Domain.MindMaps;
 public sealed class MindMap
 {
     public MindMapId Id { get; }
-    public Topic Root { get; }
+    public Topic Root { get; private set; }
 
-    private MindMap(MindMapId id, Topic root)
+    private MindMap(MindMapId id, Topic? root)
     {
         Id = id;
-        Root = root;
-        Root.MindMap = this; // Set the mind map reference
+        if (root != null)
+        {
+            Root = root;
+            Root.MindMap = this; // Set the mind map reference
+        }
     }
 
     public static MindMap Create(string rootContent)
     {
         var mindMapId = MindMapId.New();
-        var root = new Topic(TopicId.NewUnique(), rootContent, null!);
-        var mindMap = new MindMap(mindMapId, root);
+        var mindMap = new MindMap(mindMapId, null);
+        var root = new Topic(TopicId.NewUnique(), rootContent, mindMap);
+        mindMap.Root = root;
         return mindMap;
     }
 

@@ -9,7 +9,7 @@ namespace Cartamentis.Domain.Topics;
 /// </summary>
 public class Topic
 {
-    private string _content;
+    private string _content = string.Empty;
     private Topic? _parent;
     private readonly List<Topic> _children = new();
 
@@ -366,6 +366,31 @@ public class Topic
     }
 
     /// <summary>
+    /// Creates a new child topic for the specified parent topic.
+    /// </summary>
+    /// <param name="content">The content of the child topic.</param>
+    /// <param name="mindMapId">The ID of the mind map.</param>
+    /// <param name="parent">The parent topic.</param>
+    /// <returns>The newly created child topic.</returns>
+    public static Topic CreateChild(string content, MindMapId mindMapId, Topic parent)
+    {
+        if (parent == null)
+            throw new ArgumentNullException(nameof(parent));
+
+        var child = new Topic(content, parent.MindMap);
+        parent.AddChild(child);
+        return child;
+    }
+
+    /// <summary>
+    /// Removes this topic from its parent.
+    /// </summary>
+    public void RemoveFromParent()
+    {
+        DetachFromParent();
+    }
+
+    /// <summary>
     /// Returns a string representation of this topic.
     /// </summary>
     /// <returns>The content of the topic.</returns>
@@ -454,7 +479,7 @@ public class Topic
     /// </summary>
     /// <param name="childId">The ID of the child to move.</param>
     /// <param name="newIndex">The new index for the child.</param>
-    internal void MoveChildTo(TopicId childId, int newIndex)
+    public void MoveChildTo(TopicId childId, int newIndex)
     {
         var child = _children.FirstOrDefault(c => c.Id == childId);
         if (child == null)
